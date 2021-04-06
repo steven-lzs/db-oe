@@ -1,14 +1,21 @@
 import React from 'react';
-import Axios from 'axios';
+// import Axios from 'axios';
 import logo from '../logo.svg';
+import user from '../api/user';
 
 function Login() {
     const first = () => {
-        Axios.post('http://application.test/api/sayHi', {}).then(resp => {
-            if(resp.status === 200){
-                alert(resp.data.data);
+        // Axios.post('http://db-oe.test/api/sayHi', {}).then(resp => {
+        //     if(resp.status === 200){
+        //         alert(resp.data.data);
+        //     }
+        // });
+        user.login().then(resp => {
+            if(resp.status === 200) {
+                alert(resp.data.item);
             }
-        });
+        })
+
     }
     return(
         <div className="h-full w-full text-center table">
