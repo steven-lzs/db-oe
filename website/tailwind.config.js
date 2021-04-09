@@ -26,6 +26,14 @@ module.exports = {
       indigo: colors.indigo,
       purple: colors.violet,
       pink: colors.pink,
+
+      quartz: "#DDD6F3",
+      pale_turquoise: "#A8EDEA",
+      
+      cosmos: "#fcd1d1",
+      soft_peach: "#ece2e1",
+      iceberg: "#d3e0dc",
+      power_blue: "#aee1e1"
     },
     spacing: {
       px: '1px',

@@ -16,3 +16,29 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.card {
+  background: grey;
+  border-radius: 5px;
+  box-shadow: 0px 10px 30px -5px rgba(0, 0, 0, 0.3);
+  transition: box-shadow 0.5s;
+  will-change: transform;
+  border: 15px solid white;
+}
+
+.card:hover {
+  box-shadow: 0px 30px 100px -10px rgba(0, 0, 0, 0.4);
+}
+
+.ball {
+  width: 100px;
+  height: 100px;
+  background: hotpink;
+  border-radius: 50%;
+  cursor: -webkit-grab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  white-space: pre;
+}

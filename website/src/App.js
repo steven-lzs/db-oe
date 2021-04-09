@@ -1,16 +1,10 @@
-import logo from './logo.svg';
 import './index.css';
 import Main from './containers/Main';
+import 'antd/dist/antd.css';
 
-function App() {
+const App = () => {
   return (
     <div className="App">
-      {/* <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Hi from me.
-        </p>
-      </header> */}
       <Main />
     </div>
   );
