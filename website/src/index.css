@@ -42,3 +42,8 @@ code {
   color: white;
   white-space: pre;
 }
+
+.MuiButtonBase-root {
+  border: none !important;
+  outline: none !important;
+}

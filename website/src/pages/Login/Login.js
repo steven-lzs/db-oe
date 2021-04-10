@@ -1,103 +1,204 @@
-import React, { useState, useEffect, useRef } from 'react';
-import user from '../../api/user';
+import React, { useRef, useState } from 'react'
+// import { Card, Input, Space, Button } from 'antd';
+// import { styled } from '@material-ui/core/styles';
+import withWidth from '@material-ui/core/withWidth'
+import Button from '@material-ui/core/Button'
+import Card from '@material-ui/core/Card'
+import TextField from '@material-ui/core/TextField'
+import CardContent from '@material-ui/core/CardContent'
+// import Backdrop from '@material-ui/core/Backdrop';
+// import Checkbox from '@material-ui/core/Checkbox';
+// import Select from '@material-ui/core/Select';
+// import MenuItem from '@material-ui/core/MenuItem';
+// import user from '../../api/user';
 
-import { useTransition, useSpring, useChain, animated, config } from 'react-spring';
-// import { useDrag } from 'react-use-gesture';
+import { useSpring, useChain, animated } from 'react-spring'
+import { useScroll } from 'react-use-gesture'
 
-const calc = (x, y) => [-(y - window.innerHeight / 2) / 20, (x - window.innerWidth / 2) / 20, 1.1]
-const trans = (x, y, s) => `perspective(600px) rotateX(${x}deg) rotateY(${y}deg) scale(${s})`
+function Login(props) {
+  // const [scale_, setScale] = useState(1);
+  // let [inner, setInner] = useState([]);
+  // const zoomInRef = useRef();
+  // const zoomIn = useSpring({
+  //     ref: zoomInRef,
+  //     from: {
+  //         scale: 0
+  //     },
+  //     scale: scale_
+  // })
 
-const background = [
-    require("../../assets/img/officeBg.svg").default,
-    require("../../assets/img/natureBg.svg").default,
-    require("../../assets/img/calendarBg.svg").default,
-    require("../../assets/img/trainBg.svg").default
-];
-const img = require('../../assets/img/having_fun.svg').default;
+  // const slideInRef = useRef();
+  // const slideIn = useSpring({
+  //     ref: slideInRef,
+  //     from: {
+  //         pos: '-120%'
+  //     },
+  //     pos: '0%'
+  // })
 
-function Login() {
-    const [props, set1] = useSpring(() => ({ xys: [0, 0, 1], config: { mass: 5, tension: 350, friction: 40 } }))
-    // const [{ xy }, set] = useSpring(() => ({ xy: [0, 0] }))
-    // const bind = useDrag(({offset: [x, y]}) => {
-    //     set({ xy: [x,y] })
-    // })
-    const zoomInRef = useRef();
-    const zoomIn = useSpring({
-        ref: zoomInRef,
-        from: {
-            scale: 0
-        },
-        scale: 1,
-        config: {
-            duration: 2000
-        }
-    })
+  // const scaleDown = (event) => {
+  //     event.stopPropagation();
+  //     setScale(0.2);
+  // }
 
-    const [index, set] = useState(0)
-    const transitionsRef = useRef();
-    const transitions = useTransition(background[index], null, {
-      ref: transitionsRef,
-      from: { opacity: 0 },
-      enter: { opacity: 1 },
-      leave: { opacity: 0 },
-      config: config.molasses
-    })
+  // useChain([zoomInRef, slideInRef])
+  const [{ width }, set] = useSpring(() => ({ width: '0%' }))
+  // const height_ = document.documentElement.scrollHeight;
 
-    const fadeInRef = useRef();
-    const fadeIn = useSpring({
-        ref: fadeInRef,
-        from: {
-            opacity: 0,
-        },
-        opacity: 1,
-        config: {
-            duration: 1000
-        }
-    })
-    useEffect(() => void setInterval(() => set(state => { 
-        console.log(state);
-        return (state + 1) % background.length
-    }), 3000), [])
-    useChain([zoomInRef, fadeInRef, transitionsRef]);
+  useScroll(
+    ({ xy: [, y] }) => {
+      const height =
+        document.documentElement.scrollHeight -
+        document.documentElement.offsetHeight
+      console.log('what is xy ', y / height)
+      set({ width: `${(y / height) * 100}%` })
+    },
+    { domTarget: window },
+  )
 
+  const AnimatedCard = animated(Card)
+  const [open, setOpen] = useState(false)
+  const [screenWidth] = useState(props.width)
 
-    const first = () => {
-        user.login().then(resp => {
-            if(resp.status === 200) {
-                alert(resp.data.item);
-            }
-        })
+  const firstZoomIn = useSpring({
+    from: {
+      scale: 0,
+    },
+    scale: 1,
+  })
 
-    }
+  const zoomInRef = useRef()
+  const zoomIn = useSpring({
+    ref: zoomInRef,
+    from: {
+      scale: 0,
+    },
+    scale: open ? 1 : 0,
+  })
 
-    // useEffect(() => void setInterval(() => set(state => (state + 1) % 4), 2000), [])
+  const title = useSpring({
+    from: {
+      fontWeight: 'normal',
+      fontSize: '15px',
+      height: '100%',
+    },
+    fontWeight: open ? 'bold' : 'normal',
+    fontSize: open ? '25px' : '15px',
+    height: open ? '10px' : '100%',
+  })
 
-    return(
-        <div className="table w-full h-full relative">
-            {/* <div className="table-cell align-middle w-full h-full" style={{background: `url(${background}) no-repeat center`, backgroundSize: 'contain'}}>
-                <img src={require('../../assets/img/having_fun.svg').default} className="m-auto h-5/6 z-10" />
-            </div> */}
-            <div className="table-cell align-middle w-full h-full relative">
-                <div className="absolute table w-full h-full z-20">
-                    <animated.div style={fadeIn} className="table-cell align-middle text-center text-6xl font-bold">In Progress</animated.div>
-                </div>
-                <animated.img style={{
-                    transform: zoomIn.scale.interpolate(zoomIn => `scale(${zoomIn})`)
-                }} src={require('../../assets/img/having_fun.svg').default} className="mx-auto h-5/6 z-10" />
-            </div>
-            {
-                transitions.map(({ item, props, key }) => (
-                    <animated.div
-                      key={key}
-                      className="bg table-cell align-middle w-full h-full absolute top-0 left-0"
-                      style={{ ...props, background: `url(${item}) no-repeat center`, backgroundSize: 'contain', zIndex: -1 }}
-                    >
-                        {/* <img src={require('../../assets/img/having_fun.svg').default} className="m-auto h-5/6 z-10" /> */}
-                    </animated.div>
-                  ))
-            }
+  const enlargeRef = useRef()
+  const rest = useSpring({
+    ref: enlargeRef,
+    from: {
+      width: ['xs', 'sm'].includes(screenWidth) ? '20%' : '7%',
+      height: '5%',
+      pointerEvents: 'auto',
+      backgroundColor: 'red',
+      cursor: 'pointer',
+      borderRadius: '50px',
+    },
+    width: open
+      ? ['xs', 'sm'].includes(screenWidth)
+        ? '80%'
+        : '40%'
+      : ['xs', 'sm'].includes(screenWidth)
+      ? '20%'
+      : '7%',
+    height: open ? '60%' : '5%',
+    pointerEvents: open ? 'none' : 'auto',
+    backgroundColor: open ? 'blue' : 'red',
+    cursor: open ? 'auto' : 'pointer',
+    borderRadius: open ? '5px' : '50px',
+  })
+
+  useChain(open ? [enlargeRef, zoomInRef] : [zoomInRef, enlargeRef])
+
+  const minimize = (e) => {
+    e.stopPropagation()
+    setOpen(false)
+  }
+
+  return (
+    <div className="h-full w-full">
+      <div className="table w-full h-full relative">
+        <div className="table-cell align-middle relative text-center">
+          <animated.div
+            className="bg-red-600 h-12 fixed top-0"
+            style={{ width }}
+          />
+          {/* <animated.div
+                        style={{
+                            transform: zoomIn.scale.interpolate(scale => `scale(${scale})`)
+                        }} 
+                        className="normal-case mx-auto w-10/12 md:w-7/12" 
+                        onClick={() => setScale(1)}
+                    >   
+                    Login
+                        <Card className="h-full w-full">
+                            <CardContent>
+                                <div className="grid-cols-12 grid gap-4 mb-4">
+                                    <animated.div style={{transform: slideIn.pos.interpolate(pos => `translateX(${pos})`)}} className="col-span-12">
+                                        <TextField className="w-full" variant="outlined" label="Name"></TextField>
+                                    </animated.div>
+                                </div>
+                                <Button color="secondary" variant="contained" onClick={scaleDown}>cancel</Button>
+                            </CardContent>
+                        </Card>
+                    </animated.div> */}
+          <AnimatedCard
+            onClick={() => setOpen(true)}
+            className="mx-auto block"
+            style={{
+              transform: firstZoomIn.scale.interpolate(
+                (scale) => `scale(${scale})`,
+              ),
+              ...rest,
+            }}
+          >
+            <animated.div style={{ ...title }} className="table w-full">
+              <div className="table-cell align-middle">
+                {open ? 'Login' : 'Start'}
+              </div>
+            </animated.div>
+
+            <AnimatedCard
+              className="pointer-events-auto"
+              style={{
+                transform: zoomIn.scale.interpolate(
+                  (scale) => `scale(${scale})`,
+                ),
+              }}
+            >
+              <CardContent>
+                <TextField
+                  className="w-full"
+                  variant="outlined"
+                  label="Name"
+                ></TextField>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={minimize}
+                >
+                  Cancel
+                </Button>
+              </CardContent>
+            </AnimatedCard>
+          </AnimatedCard>
+
+          {/* <div className="inline-block">
+                        <AnimatedCard style={{transform: zoomIn2.scale.interpolate(scale => `scale(${scale})`) }} className="inline-block">
+                            <CardContent>
+                                <Button variant="contained" color="primary" className="rounded-full normal-case px-10" onClick={() => setOpen(open => !open)}>Cancel</Button>
+                            </CardContent>
+                        </AnimatedCard>
+                    </div> */}
         </div>
-    )
+      </div>
+      <div>next section</div>
+    </div>
+  )
 }
 
-export default Login;
+export default withWidth()(Login)

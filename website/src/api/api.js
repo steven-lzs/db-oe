@@ -1,12 +1,12 @@
-import axios from "axios";
+import axios from 'axios'
 
-let url = "";
+let url = ''
 
-if (window.location.href.includes("localhost")) {
+if (window.location.href.includes('localhost')) {
   // url = "http://chope2-api.localhost/api";
-  url = "http://db-oe.test/api";
+  url = 'http://db-oe.test/api'
 } else {
-  url = "http://api.db-oe.com/api"
+  url = 'http://api.db-oe.com/api'
 }
 
 const BaseApi = axios.create({
@@ -18,21 +18,19 @@ const BaseApi = axios.create({
   //     : "http://localhost:8000/api"
   baseURL: url,
   headers: {
-    Accept: "application/json",
-    "Content-Type": "application/json"
-  }
-});
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  },
+})
 
-let Api = () => {
-//   const token = Store.state.token;
-//   if (token != null) {
-//     BaseApi.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-//   }
-  return BaseApi;
-};
-
+const Api = () =>
+  //   const token = Store.state.token;
+  //   if (token != null) {
+  //     BaseApi.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  //   }
+  BaseApi
 BaseApi.interceptors.response.use(
-  function(response) {
+  function (response) {
     // if (Store.state.login) {
     //   if (response.data.status === 401) {
     //     Users.logout().then(() => {
@@ -54,31 +52,31 @@ BaseApi.interceptors.response.use(
     // console.log('stop loading');
     if (
       response.data.status === 500 &&
-      response.data.message != "Invalid Token!"
+      response.data.message != 'Invalid Token!'
     ) {
-    //   Notify.create({
-    //     message: response.data.message,
-    //     position: "top",
-    //     type: "negative",
-    //     progress: true,
-    //     html: true,
-    //     timeout: 2000
-    //   });
+      //   Notify.create({
+      //     message: response.data.message,
+      //     position: "top",
+      //     type: "negative",
+      //     progress: true,
+      //     html: true,
+      //     timeout: 2000
+      //   });
     }
-    return response.data;
+    return response.data
   },
-  function(error) {
+  function (error) {
     if (error.response.status === 401) {
-    //   notify("Unauthorized.");
-    //   window.localStorage.removeItem("vuex");
-    //   Store.state.token = "";
-    //   Store.state.userInfo = "";
-    //   window.location.href = "/login";
-      return error.response;
+      //   notify("Unauthorized.");
+      //   window.localStorage.removeItem("vuex");
+      //   Store.state.token = "";
+      //   Store.state.userInfo = "";
+      //   window.location.href = "/login";
+      return error.response
     }
     if (error.response.status === 429) {
-      console.log("Too many requests.");
-      window.location.href = "/login";
+      console.log('Too many requests.')
+      window.location.href = '/login'
     }
     if (error.response.status === 403) {
       // window.location.href = "/login";
@@ -88,13 +86,13 @@ BaseApi.interceptors.response.use(
       // router.push({ path: '/dashboard' }, () => { })
     }
     if (error.response.status === 500) {
-    //   notify(error.response.statusText);
+      //   notify(error.response.statusText);
     }
     if (error.response.status === 422) {
-      return error.response;
+      return error.response
     }
-    return Promise.reject(error.response);
-  }
-);
+    return Promise.reject(error.response)
+  },
+)
 
-export default Api;
+export default Api

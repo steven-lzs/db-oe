@@ -1,13 +1,25 @@
-import './index.css';
-import Main from './containers/Main';
-import 'antd/dist/antd.css';
+import React from 'react'
+import './index.css'
+// import 'antd/dist/antd.dark.css';
+
+import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles'
+import CssBaseline from '@material-ui/core/CssBaseline'
+import Main from './containers/Main'
 
 const App = () => {
+  const darkTheme = createMuiTheme({
+    palette: {
+      type: 'dark',
+    },
+  })
   return (
-    <div className="App">
-      <Main />
-    </div>
-  );
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
+      <div className="App">
+        <Main />
+      </div>
+    </ThemeProvider>
+  )
 }
 
-export default App;
+export default App
