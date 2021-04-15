@@ -44,6 +44,6 @@ code {
 }
 
 .MuiButtonBase-root {
-  border: none !important;
+  /* border: none !important; */
   outline: none !important;
 }

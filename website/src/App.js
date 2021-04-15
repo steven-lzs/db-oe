@@ -15,7 +15,7 @@ const App = () => {
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-      <div className="App">
+      <div className="App h-screen container mx-auto">
         <Main />
       </div>
     </ThemeProvider>
