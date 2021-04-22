@@ -5,4 +5,7 @@ module.exports = {
       plugins: [require('tailwindcss'), require('autoprefixer')],
     },
   },
+  babel: {
+    plugins: [['module:react-native-dotenv']],
+  },
 }

@@ -1,4 +1,5 @@
 const colors = require('tailwindcss/colors')
+const defaultTheme = require('tailwindcss/defaultTheme')
 
 module.exports = {
   mode: 'jit',
@@ -27,6 +28,8 @@ module.exports = {
         raisin_black: '#2D2D34',
 
         rose: colors.rose,
+        gray: colors.gray,
+        dark: '#303030',
       },
       height: (theme) => ({
         '1/10': '10%',
@@ -60,8 +63,25 @@ module.exports = {
         rose: `0px 0px 1px 1px #F43F5E26,
                 0px 0px 2px 2px #F43F5E26,
                 0px 0px 4px 3px #F43F5E26,
-                0px 0px 8px 4px #F43F5E26,
-                0px 0px 16px 5px #F43F5E26`,
+                0px 0px 8px 4px #F43F5E26`,
+        'inset-rose': `inset 0px 0px 1px 1px #F43F5E26,
+                inset 0px 0px 2px 2px #F43F5E26,
+                inset 0px 0px 4px 3px #F43F5E26,
+                inset 0px 0px 8px 4px #F43F5E26`,
+        'pop-rose': `inset 0px 0px 1px 1px #F43F5E26,
+                inset 0px 0px 2px 2px #F43F5E26,
+                inset 0px 0px 4px 3px #F43F5E26,
+                inset 0px 0px 8px 4px #F43F5E26, 
+                0px 0px 1px 1px #F43F5E26,
+                0px 0px 2px 2px #F43F5E26,
+                0px 0px 4px 3px #F43F5E26,
+                0px 0px 8px 4px #F43F5E26`,
+      },
+      zIndex: {
+        '-1': '-1',
+      },
+      fontFamily: {
+        sans: ['Raleway', ...defaultTheme.fontFamily.sans],
       },
     },
   },
