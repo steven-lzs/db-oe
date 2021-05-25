@@ -5,7 +5,7 @@ import './index.css'
 
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles'
 import CssBaseline from '@material-ui/core/CssBaseline'
-import Main from 'containers/v1/Main/Main'
+import Main from 'containers/Main'
 
 const App = () => {
   const darkTheme = createMuiTheme({
@@ -16,7 +16,7 @@ const App = () => {
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-      <div className="App h-screen w-full font-sans">
+      <div className="App">
         <Main />
       </div>
     </ThemeProvider>

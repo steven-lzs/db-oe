@@ -1,7 +1,16 @@
+// eslint-disable-next-line
 import api from './api'
 
-export default {
-  login() {
-    return api().post(`/sayHi`, {})
+const user = {
+  login(param) {
+    return api().post(`/login`, param)
+  },
+  updateDiary(param) {
+    return api().post(`/updateDiary`, param)
+  },
+  getAllDiary() {
+    return api().post(`/getDiary`, {})
   },
 }
+
+export default user

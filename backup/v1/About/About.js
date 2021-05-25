@@ -9,7 +9,7 @@ const About = () => {
   }, [])
   return (
     <div>
-        About
+      About
       {/* <div className="w-12 h-12 bg-red-600 box"></div> */}
     </div>
   )
