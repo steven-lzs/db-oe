@@ -1,19 +1,26 @@
-import logo from './logo.svg';
-import './index.css';
-import Main from './containers/Main';
+import React from 'react'
+import './index.css'
+// import Scrollbar from 'react-smooth-scrollbar'
+// import 'antd/dist/antd.dark.css';
 
-function App() {
+import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles'
+import CssBaseline from '@material-ui/core/CssBaseline'
+import Main from 'containers/Main'
+
+const App = () => {
+  const darkTheme = createMuiTheme({
+    palette: {
+      type: 'dark',
+    },
+  })
   return (
-    <div className="App">
-      {/* <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Hi from me.
-        </p>
-      </header> */}
-      <Main />
-    </div>
-  );
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
+      <div className="App">
+        <Main />
+      </div>
+    </ThemeProvider>
+  )
 }
 
-export default App;
+export default App

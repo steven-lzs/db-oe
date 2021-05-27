@@ -1,0 +1,18 @@
+.resp-bg-gradient {
+    @apply bg-gradient-to-b;
+}
+
+.resp-object {
+    @apply object-cover object-center;
+    height: 50%;
+}
+
+@screen md {
+    .resp-bg-gradient {
+        @apply bg-gradient-to-r;
+    }
+
+    .resp-object {
+        @apply object-cover h-full ;
+    }
+}

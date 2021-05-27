@@ -1,0 +1,6 @@
+{
+  "_comment": "this file make import statement start from src/...",
+    "compilerOptions": {
+      "baseUrl": "src"
+    }
+  }

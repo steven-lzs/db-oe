@@ -15,9 +15,23 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:api')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 
-Route::post('/sayHi', 'User\UserController@sayHi');
+// Route::group(['middleware' => ['auth:sanctum']], function () {
+//     Route::post('/updateDiary', 'User\UserController@updateDiary');
+//     Route::post('/getDiary', 'User\UserController@getDiary');
+//     Route::post('/getDiaryById', 'User\UserController@getDiaryById');
+//     Route::post('/register', 'User\UserController@register');
+//     Route::post('/logout', 'User\UserController@logout');
+// });
+
+Route::post('/login', 'User\UserController@login');
+Route::post('/updateDiary', 'User\UserController@updateDiary');
+Route::post('/getDiary', 'User\UserController@getDiary');
+Route::post('/getDiaryById', 'User\UserController@getDiaryById');
+Route::post('/deleteEntry', 'User\UserController@deleteEntry');
+Route::post('/register', 'User\UserController@register');
+Route::post('/logout', 'User\UserController@logout');
 
