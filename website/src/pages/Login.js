@@ -13,9 +13,20 @@ const Login = () => {
   const history = useHistory()
   const [{ email, password }, setState] = useState(initialState)
 
-  //   const clearState = () => {
-  //     setState({ ...initialState });
-  //   };
+  const getDeviceType = () => {
+    const ua = navigator.userAgent
+    if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) {
+      return 'tablet'
+    }
+    if (
+      /Mobile|iP(hone|od)|Android|BlackBerry|IEMobile|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(
+        ua,
+      )
+    ) {
+      return 'mobile'
+    }
+    return 'desktop'
+  }
 
   const onChange = (e) => {
     const { name, value } = e.target
@@ -23,13 +34,16 @@ const Login = () => {
   }
 
   const login = () => {
+    const device = getDeviceType()
     const param = {
       email,
       password,
+      device_name: device,
     }
     user.login(param).then((resp) => {
       console.log(resp)
       if (resp.status === 200) {
+        localStorage.setItem('token', resp.data)
         history.push('/Overview')
         setState({ ...initialState })
       }

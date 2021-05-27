@@ -10,25 +10,22 @@ if (window.location.href.includes('localhost')) {
 }
 
 const BaseApi = axios.create({
-  // //baseURL: "http://localhost:8000/api",
-  // env === "production"
-  //     ? ""
-  //     : env === "staging"
-  //     ? "http://chopeshiftweb2.sghachi.com/application/public/api"
-  //     : "http://localhost:8000/api"
   baseURL: url,
+  withCredentials: true,
+  responseType: 'json',
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json',
   },
 })
 
-const Api = () =>
-  //   const token = Store.state.token;
-  //   if (token != null) {
-  //     BaseApi.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-  //   }
-  BaseApi
+const Api = () => {
+  const token = localStorage.getItem('token')
+  if (token != null) {
+    BaseApi.defaults.headers.common['Authorization'] = `Bearer ${token}`
+  }
+  return BaseApi
+}
 
 BaseApi.interceptors.response.use(
   function (response) {
@@ -36,6 +33,7 @@ BaseApi.interceptors.response.use(
   },
   function (error) {
     if (error.response.status === 401) {
+      window.location.href = '/login'
       return error.response
     }
     if (error.response.status === 429) {
