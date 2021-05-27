@@ -36,6 +36,7 @@ const Overview = () => {
     user.logout().then((resp) => {
       if (resp.status === 200) {
         history.replace('/login')
+        localStorage.removeItem('token');
       }
     })
   }
