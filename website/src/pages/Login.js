@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import * as Mui from '@material-ui/core'
+import { withStyles } from '@material-ui/core/styles'
 import { useHistory } from 'react-router-dom'
 
 import user from 'api/user'
@@ -12,6 +13,7 @@ const initialState = {
 const Login = () => {
   const history = useHistory()
   const [{ email, password }, setState] = useState(initialState)
+  // const [error, setError] = useState('');
 
   const getDeviceType = () => {
     const ua = navigator.userAgent
@@ -47,8 +49,26 @@ const Login = () => {
         history.push('/Overview')
         setState({ ...initialState })
       }
+
+      // if(resp.errors) {
+      //   setError('Invalid fields');
+      // }
     })
   }
+
+  const ValidationTextField = withStyles({
+    root: {
+      '& fieldset': {
+        borderRadius: '10px',
+        borderStyle: 'hidden',
+        boxShadow: 'inset 5px 5px 10px black',
+        '& legend span': {
+          display: 'none',
+        },
+      },
+    },
+  })(Mui.TextField)
+
   return (
     <div className="text-center table w-full h-full">
       <div className="table-cell align-middle w-full h-full">
@@ -56,7 +76,7 @@ const Login = () => {
           <Mui.TextField
             value={email}
             name="email"
-            label="Email"
+            placeholder="Email"
             variant="outlined"
             onChange={onChange}
           />
@@ -64,7 +84,7 @@ const Login = () => {
         <div className="mb-6">
           <Mui.TextField
             value={password}
-            label="Password"
+            placeholder="Password"
             name="password"
             type="password"
             variant="outlined"
@@ -75,6 +95,13 @@ const Login = () => {
         <Mui.Button variant="contained" color="primary" onClick={login}>
           Login
         </Mui.Button>
+        {/* {<Mui.Snackbar anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+        autoHideDuration={3000} 
+        open={!!error} message={error}>
+        </Mui.Snackbar>} */}
       </div>
     </div>
   )

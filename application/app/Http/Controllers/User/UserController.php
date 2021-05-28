@@ -22,7 +22,11 @@ class UserController extends Controller
         $user = User::where('email', $request->email)->first();
     
         if (! $user || ! Hash::check($request->password, $user->password)) {
-            return response()->json(['msg' => 'incorrect']);
+            return response()->json([
+                'status' => 500,
+                'message' => 'Password Incorrect.',
+                'data' => []
+            ]);
         }
     
         $token = $user->createToken($request->device_name)->plainTextToken;

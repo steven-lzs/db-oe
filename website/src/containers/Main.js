@@ -11,7 +11,7 @@ const routes = [
   { path: '/login', name: 'Login', Component: Login },
   { path: '/overview', name: 'Overview', Component: Overview },
   { path: '/entry', name: 'Entry', Component: Entry },
-  { patj: '/view', name: 'View', Component: View },
+  { path: '/view', name: 'View', Component: View },
 ]
 
 const Main = () => {

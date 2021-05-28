@@ -1,6 +1,6 @@
 import api from './api'
 
-const prefix = '/diary';
+const prefix = '/diary'
 
 const diary = {
   updateDiary(param) {

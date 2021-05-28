@@ -36,7 +36,7 @@ const Overview = () => {
     user.logout().then((resp) => {
       if (resp.status === 200) {
         history.replace('/login')
-        localStorage.removeItem('token');
+        localStorage.removeItem('token')
       }
     })
   }
@@ -49,6 +49,12 @@ const Overview = () => {
       toView(param)
     }
   }
+
+  // const setOpenEditOrView_ = (id) => {
+  //   setOpenEditOrView((prevState) => {
+  //     if(prevState == id) false
+  //   })
+  // }
 
   return (
     <>
@@ -63,69 +69,94 @@ const Overview = () => {
           Log Out
         </Mui.Button>
         <div className="mb-6">
-          <div>Total {list.length} Entry</div>
-          {list.length ? (
-            list.map(({ id, content, datetime, title, diary_id }) => {
-              return (
-                <>
-                  <div className="border-b border-perfume" key={id}>
-                    <Mui.Card
-                      className="my-2"
-                      onClick={() => setOpenEditOrView(id)}
+          <div className="grid-cols-12 md:grid gap-4">
+            <div className="col-span-12 ml-2">Total {list.length} Entry</div>
+            {list.length ? (
+              list.map(
+                ({ id, content, datetime, title, diary_id, docs: img }) => {
+                  return (
+                    <div
+                      className="border-b border-perfume m-2 col-span-4"
+                      key={id}
                     >
-                      <Mui.CardContent>
-                        <Mui.Typography
-                          gutterBottom
-                          component="h5"
-                          variant="h5"
-                          className="line-clamp-1 font-bold"
-                        >
-                          {title ? title : ''}
-                        </Mui.Typography>
-                        <Mui.Typography
-                          gutterBottom
-                          variant="body2"
-                          component="p"
-                          className="line-clamp-3"
-                        >
-                          {content} ...
-                        </Mui.Typography>
-                        <div className="flex justify-between">
-                          <span>{moment(datetime).format('DD MMM yyyy')}</span>
-                          <span>{moment(datetime).format('dddd')}</span>
-                          <span className="italic">
-                            {moment(datetime).format('hh:mm A')}
-                          </span>
-                        </div>
-                      </Mui.CardContent>
-                      {openEditOrView == id && (
-                        <Mui.CardActions className="flex justify-between">
-                          <Mui.Button
-                            size="medium"
-                            color="secondary"
-                            onClick={() => editOrView('edit', { id, diary_id })}
-                          >
-                            edit
-                          </Mui.Button>
-                          <Mui.Button
-                            size="medium"
-                            color="secondary"
-                            onClick={() => editOrView('view', { id, diary_id })}
-                          >
-                            view
-                          </Mui.Button>
-                        </Mui.CardActions>
-                      )}
-                    </Mui.Card>
-                  </div>
-                </>
+                      <Mui.Card
+                        className="mb-2"
+                        onClick={() =>
+                          setOpenEditOrView((prevState) =>
+                            prevState === id ? '' : id,
+                          )
+                        }
+                      >
+                        <Mui.CardContent className="grid-cols-12 grid gap-2">
+                          <div className={img ? 'col-span-8' : 'col-span-12'}>
+                            <Mui.Typography
+                              gutterBottom
+                              component="h5"
+                              variant="h5"
+                              className="line-clamp-1 font-bold"
+                            >
+                              {title ? title : ''}
+                            </Mui.Typography>
+                            <Mui.Typography
+                              gutterBottom
+                              variant="body2"
+                              component="p"
+                              className="line-clamp-3"
+                            >
+                              {content} ...
+                            </Mui.Typography>
+                            <div className="flex justify-between">
+                              <span>
+                                {moment(datetime).format('DD MMM yyyy')}
+                              </span>
+                              <span>{moment(datetime).format('dddd')}</span>
+                              <span className="italic">
+                                {moment(datetime).format('hh:mm A')}
+                              </span>
+                            </div>
+                          </div>
+                          <div
+                            className={
+                              img
+                                ? 'col-span-4 bg-cover bg-center'
+                                : 'col-span-0 bg-cover bg-center'
+                            }
+                            style={{ backgroundImage: 'url(' + img + ')' }}
+                          ></div>
+                        </Mui.CardContent>
+                        {openEditOrView === id && (
+                          <Mui.CardActions className="flex justify-between">
+                            <Mui.Button
+                              size="medium"
+                              color="secondary"
+                              onClick={() =>
+                                editOrView('edit', { id, diary_id })
+                              }
+                            >
+                              edit
+                            </Mui.Button>
+                            <Mui.Button
+                              size="medium"
+                              color="secondary"
+                              onClick={() =>
+                                editOrView('view', { id, diary_id })
+                              }
+                            >
+                              view
+                            </Mui.Button>
+                          </Mui.CardActions>
+                        )}
+                      </Mui.Card>
+                    </div>
+                  )
+                },
               )
-            })
-          ) : (
-            <Mui.Backdrop open={true} className="z-10">
-              <Mui.CircularProgress color="inherit" />
-            </Mui.Backdrop>
-          )}
+            ) : (
+              <Mui.Backdrop open={true} className="z-10">
+                <Mui.CircularProgress color="inherit" />
+              </Mui.Backdrop>
+            )}
+          </div>
         </div>
       </div>
       <Mui.Fab

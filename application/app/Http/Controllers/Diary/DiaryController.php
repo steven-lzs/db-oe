@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Diary;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use File;
 
 class DiaryController extends Controller
 {
@@ -33,16 +34,29 @@ class DiaryController extends Controller
         }
 
         $count = 0;
-        $img_arr = [];
+        $doc_arr = [];
 
         if(sizeOf($request->file) > 0){
             foreach($request->file as $file){
-                $data = substr($file, strpos($file, ',') + 1);
-                $file = base64_decode($data);
-                $safeName = $diary_id . '_' . $count . '.'.'png';
-                file_put_contents(public_path().'/storage/'.$safeName, $file);
-                $count = $count + 1;
-                array_push($img_arr, $safeName);
+                $file_ = $file['base64'];
+                $data = substr($file_, strpos($file_, ',') + 1);
+                $file_ = base64_decode($data);
+
+                if(strpos($file['type'], 'image') !== false){
+                    $safeName = $diary_id . '_' . $count . '.'.'png';
+                    file_put_contents(public_path().'/storage/'.$safeName, $file_);
+                    $count = $count + 1;
+
+                    array_push($doc_arr, $safeName);
+                } 
+
+                if(strpos($file['type'], 'pdf') !== false) {
+                    $safeName = $diary_id . '_' . str_replace(' ', '_', $file['name']) . '_' . $count . '.'.'pdf';
+                    file_put_contents(public_path().'/storage/'.$safeName, $file_);
+                    $count = $count + 1;
+
+                    array_push($doc_arr, $safeName);
+                }
             }
         }
 
@@ -52,7 +66,7 @@ class DiaryController extends Controller
                 'content' => $request->content,
                 'title' => $request->title,
                 'diary_id' => $diary_id,
-                'images' => json_encode($img_arr),
+                'docs' => json_encode($doc_arr),
                 'created_on' => date('Y-m-d'),
                 'modified_on' => date('Y-m-d')
             ]);
@@ -63,7 +77,7 @@ class DiaryController extends Controller
                     'datetime' => $request->datetime,
                     'content' => $request->content,
                     'diary_id' => $diary_id,
-                    'images' => json_encode($img_arr),
+                    'docs' => json_encode($doc_arr),
                     'title' => $request->title,
                     'modified_on' => date('Y-m-d')
                 ]);
@@ -78,10 +92,29 @@ class DiaryController extends Controller
 
     public function getDiary() {
         $result = DB::table('diary')
-            ->selectRaw('id, title, datetime, LEFT(content,200) as content, diary_id')
+            ->selectRaw('id, title, datetime, LEFT(content,300) as content, diary_id, docs')
             ->orderBy('datetime', 'desc')
             ->get();
-        // $result = '555';
+        
+        foreach($result as &$res){
+            $docs = json_decode($res->docs);
+            if($docs){
+                foreach($docs as $doc){
+                    $path = public_path() . '/storage/' . $doc;
+                    $type = mime_content_type($path);
+                    if(strpos($type, 'image') !== false){
+                        $data = file_get_contents($path);
+                        $base64 = 'data:' . $type . ';base64,' . base64_encode($data);
+
+                        $res->docs = $base64;
+                        break;
+                    }
+                }
+            } else {
+                $res->docs = "";
+            }
+        }
+
         return response()->json([
             'status' => 200,
             'message' => 'Success',
@@ -99,6 +132,18 @@ class DiaryController extends Controller
         $messages = [];
 
         $this->validate($request, $rules, $messages, $names);
+
+        $docs = DB::table('diary')->select('docs')->where('id', $request->id)->first()->docs;
+
+        if($docs){
+            $docs = json_decode($docs);
+            foreach($docs as $doc){
+                $doc_path = public_path() . '/storage/' . $doc;
+                if(File::exists($doc_path)) {
+                    File::delete($doc_path);
+                }
+            }
+        }
 
         $result = DB::table('diary')
             ->where('id', $request->id)
@@ -123,29 +168,35 @@ class DiaryController extends Controller
         $this->validate($request, $rules, $messages, $names);
 
         $result = DB::table('diary')
-            ->selectRaw('id, title, datetime, content, images')
+            ->selectRaw('id, title, datetime, content, docs, diary_id')
             ->where('id', $request->id)
             ->first();
 
-        $img_arr = [];
+        $doc_arr = [];
 
         if($result){
-            if($result->images) {
-                $images = json_decode($result->images);
-                    if(count($images) > 0){
-                        foreach($images as $img){
-                            $path = public_path() . '/storage/' . $img;
-                            $type = pathinfo($path, PATHINFO_EXTENSION);
-                            $data = file_get_contents($path);
-                            $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-                            array_push($img_arr, $base64);
-                        }
+            if($result->docs) {
+                $docs = json_decode($result->docs);
+                if(count($docs) > 0){
+                    foreach($docs as $doc){
+                        $path = public_path() . '/storage/' . $doc;
+                        $type = mime_content_type($path);
+                        $data = file_get_contents($path);
+                        $base64 = 'data:' . $type . ';base64,' . base64_encode($data);
+
+                        array_push($doc_arr, array(
+                            'type' => $type,
+                            'name' => str_replace($result->diary_id . '_', '', $doc),
+                            'ori_name' => $doc,
+                            'base64' => $base64
+                        ));
                     }
+                }
                 
             }
         }
 
-        $result->images = $img_arr;
+        $result->docs = $doc_arr;
 
         return response()->json([
             'status' => 200,

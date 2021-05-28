@@ -3,14 +3,20 @@ import axios from 'axios'
 let url = ''
 let csrf_url = ''
 
-if (window.location.href.includes('localhost') || window.location.href.includes('127.0.0.1')) {
+if (
+  window.location.href.includes('localhost') ||
+  window.location.href.includes('127.0.0.1')
+) {
   // url = "http://chope2-api.localhost/api";
   url = 'http://127.0.0.1:8000/api'
 } else {
   url = 'http://api.db-oe.com/api'
 }
 
-if (window.location.href.includes('localhost') || window.location.href.includes('127.0.0.1')) {
+if (
+  window.location.href.includes('localhost') ||
+  window.location.href.includes('127.0.0.1')
+) {
   // url = "http://chope2-api.localhost/api";
   csrf_url = 'http://127.0.0.1:8000'
 } else {
@@ -20,12 +26,12 @@ if (window.location.href.includes('localhost') || window.location.href.includes(
 const BaseApi = axios.create({
   baseURL: url,
   headers: {
-    'Accept': 'application/json',
+    Accept: 'application/json',
     'Content-Type': 'application/json',
   },
 })
 
-BaseApi.defaults.withCredentials = true;
+BaseApi.defaults.withCredentials = true
 
 const Api = () => {
   const token = localStorage.getItem('token')
@@ -35,7 +41,7 @@ const Api = () => {
   return BaseApi
 }
 
-Api().get(`${csrf_url}/sanctum/csrf-cookie`); //get csrf cookie
+Api().get(`${csrf_url}/sanctum/csrf-cookie`) //get csrf cookie
 
 BaseApi.interceptors.response.use(
   function (response) {
@@ -61,7 +67,7 @@ BaseApi.interceptors.response.use(
       //   notify(error.response.statusText);
     }
     if (error.response.status === 422) {
-      return error.response
+      return error.response.data
     }
     return Promise.reject(error.response)
   },
