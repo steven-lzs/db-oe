@@ -13,6 +13,7 @@
     "@types/react-router": "^5.1.13",
     "antd": "^4.15.0",
     "axios": "^0.21.1",
+    "emoji-picker-react": "^3.4.6",
     "gsap": "^3.6.1",
     "react": "^17.0.2",
     "react-animate-on-scroll": "^2.1.5",

@@ -24,16 +24,36 @@ const View = () => {
         setTitle(data.title)
         setDatetime(moment(data.datetime).format('yyyy-MM-DD HH:mmA dddd'))
         setContent(data.content)
-        setFile_(data.images)
+        setFile_(data.docs)
       })
     }
   }, [])
 
   const goBack = () => history.goBack()
 
+  const setImage = (e) => {
+    setImgSel(
+      <div
+        className="h-full w-full bg-contain bg-no-repeat bg-center"
+        style={{ backgroundImage: 'url(' + e + ')' }}
+      ></div>,
+    )
+  }
+
+  const showDoc = (e) => {
+    console.log(e)
+    const base64 = e.split(',')[1]
+    let pdfWindow = window.open('')
+    pdfWindow.document.write(
+      "<iframe width='100%' height='100%' src='data:application/pdf;base64, " +
+        encodeURI(base64) +
+        "'></iframe>",
+    )
+  }
+
   return (
     <>
-      <div className="table w-full h-full p-10">
+      <div className="table w-full h-full md:p-10 p-4">
         <Mui.Button variant="contained" color="primary" onClick={goBack}>
           Back
         </Mui.Button>
@@ -41,38 +61,47 @@ const View = () => {
           <div className="py-6 font-bold text-xl">{title}</div>
           <div>{datetime}</div>
         </div>
-        <div>
-          <Mui.TextareaAutosize
-            variant="outlined"
-            aria-label="Content"
-            className="text-white w-full bg-transparent border rounded-lg overflow-y-scroll"
-            rowsMin={10}
-            value={content}
-            inputProps={{ readOnly: true }}
-          />
-        </div>
+        {content && (
+          <div className="border rounded-lg whitespace-pre-line p-2 leading-relaxed">
+            {content}
+          </div>
+        )}
         <div>
           <div className="p-4 mb-2 grid md:grid-cols-12 gap-4">
             {file_.map((f, index) => {
               return (
                 <div className="col-span-6 grid grid-cols-12 gap-2" key={index}>
-                  <div
-                    className="col-span-12 cursor-pointer"
-                    onClick={() => setImgSel(f)}
-                  >
-                    <img src={f} />
-                  </div>
+                  {f.type?.indexOf('image') != -1 ? (
+                    <div
+                      className="col-span-12 cursor-pointer"
+                      onClick={() => setImage(f.base64)}
+                    >
+                      <img src={f.base64} />
+                    </div>
+                  ) : (
+                    <div className="col-span-12">
+                      <div
+                        className="border border-white rounded-lg cursor-pointer p-4 flex bg-red-500"
+                        onClick={() => showDoc(f.base64)}
+                      >
+                        <div className="my-auto text-3xl mr-4">
+                          <FaIcon.FaFilePdf />
+                        </div>
+                        <div>{f.name}</div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )
             })}
           </div>
         </div>
         <Mui.Backdrop open={!!imgSel} className="z-10">
-            <FaIcon.FaTimesCircle
+          <FaIcon.FaTimesCircle
             className="text-4xl cursor-pointer absolute top-8 right-8"
             onClick={() => setImgSel('')}
-            />
-            <img src={imgSel} />
+          />
+          {imgSel}
         </Mui.Backdrop>
       </div>
     </>
