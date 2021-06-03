@@ -3,12 +3,14 @@ import diary from 'api/diary'
 import * as Mui from '@material-ui/core'
 import * as FaIcon from 'react-icons/fa'
 import moment from 'moment'
+import { useSnackbar } from 'notistack'
 
 import { useHistory, useLocation } from 'react-router-dom'
 
 import Picker, { SKIN_TONE_NEUTRAL } from 'emoji-picker-react'
 
 const Entry = () => {
+  const { enqueueSnackbar } = useSnackbar()
   const history = useHistory()
 
   const inputRef = useRef(null)
@@ -19,6 +21,7 @@ const Entry = () => {
   const [file_, setFile_] = useState([])
   const [imgSel, setImgSel] = useState('')
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const onEmojiClick = (event, emojiObject) => {
     const { selectionStart, selectionEnd } = inputRef.current
@@ -33,7 +36,10 @@ const Entry = () => {
   let { state: props } = useLocation()
 
   const updateDiary = () => {
-    let datetime_ = moment(datetime).format('yyyy-MM-DD HH:mm:ss')
+    setLoading(true)
+    let datetime_ = datetime
+      ? moment(datetime).format('yyyy-MM-DD HH:mm:ss')
+      : ''
     const param = {
       datetime: datetime_,
       content,
@@ -41,23 +47,32 @@ const Entry = () => {
       props,
       file: file_,
     }
-
+    console.log(param)
     diary.updateDiary(param).then((resp) => {
-      console.log(resp)
+      setLoading(false)
       if (resp.status === 200) {
         setDatetime('')
         setContent('')
         setTitle('')
         setFile_([])
+        history.goBack()
       }
-      history.goBack()
+
+      if (resp.errors) {
+        const errors = resp.errors
+        for (const key in errors) {
+          enqueueSnackbar(errors[key], { variant: 'error' })
+        }
+      }
     })
   }
 
   useEffect(() => {
     if (!!props) {
+      setLoading(true)
       diary.getDiaryById(props).then(({ data }) => {
         console.log('get a diary ', data)
+        setLoading(false)
         setTitle(data.title)
         setDatetime(moment(data.datetime).format('yyyy-MM-DDTHH:mm'))
         setContent(data.content)
@@ -90,8 +105,10 @@ const Entry = () => {
   const goBack = () => history.goBack()
 
   const deleteEntry = () => {
+    setLoading(true)
     diary.deleteEntry({ id: props.id }).then((resp) => {
       if (resp.status === 200) {
+        setLoading(false)
         history.goBack()
       }
     })
@@ -117,14 +134,19 @@ const Entry = () => {
   return (
     <div className="table w-full h-full p-10">
       <div className="flex justify-between">
-        <Mui.Button variant="contained" color="primary" onClick={goBack}>
-          Back
-        </Mui.Button>
+        <div className="border-2 border-rose-600 rounded-full shadow-pop-rose">
+          <Mui.Button
+            className="normal-case text-white px-8 py-2 rounded-full"
+            onClick={goBack}
+          >
+            Back
+          </Mui.Button>
+        </div>
         {!!props && (
           <Mui.Button
             variant="contained"
-            color="secondary"
             onClick={() => setConfirmDelete(true)}
+            className="normal-case rounded-full py-3 px-8 bg-rose-600 shadow-rose text-white"
           >
             Delete
           </Mui.Button>
@@ -134,40 +156,45 @@ const Entry = () => {
         {!!props ? 'Edit Entry' : 'New Entry'}
       </div>
       <div className="mb-6">
-        <Mui.TextField
-          id="date"
-          label="Date"
-          type="datetime-local"
-          variant="outlined"
-          value={datetime}
-          InputLabelProps={{
-            shrink: true,
-          }}
-          className="w-full"
-          onChange={(e) => setDatetime(e.target.value)}
-        />
+        <div className="bg-gray-900 w-full p-3 rounded-full">
+          <Mui.InputBase
+            id="date"
+            label="Date"
+            type="datetime-local"
+            variant="outlined"
+            value={datetime}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            className="w-full"
+            onChange={(e) => setDatetime(e.target.value)}
+          />
+        </div>
       </div>
       <div className="mb-6">
-        <Mui.TextField
-          label="Title"
-          value={title}
-          variant="outlined"
-          multiline
-          className="w-full"
-          onChange={(e) => setTitle(e.target.value)}
-        />
+        <div className="bg-gray-900 w-full p-3 rounded-full">
+          <Mui.InputBase
+            placeholder="Title"
+            value={title}
+            variant="outlined"
+            multiline
+            className="w-full"
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        </div>
       </div>
       <div className="mb-6">
         Content
-        <Mui.TextareaAutosize
-          variant="outlined"
-          ref={inputRef}
-          aria-label="Content"
-          className="text-white w-full bg-transparent border rounded-lg overflow-y-scroll"
-          rowsMin={10}
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-        />
+        <div className="bg-gray-900 w-full p-3 rounded-lg">
+          <Mui.TextareaAutosize
+            ref={inputRef}
+            aria-label="Content"
+            className="text-white w-full bg-transparent rounded-lg overflow-y-scroll"
+            rowsMin={10}
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+          />
+        </div>
       </div>
       <div className="mb-6">
         <Picker
@@ -228,14 +255,14 @@ const Entry = () => {
           </Mui.Button>
         </div>
       </div>
-      <div className="fixed bottom-0 right-0 w-full z-10">
+      <div className="fixed bottom-0 right-0 w-full z-10 p-2">
         <Mui.Button
           variant="contained"
           color="primary"
-          onClick={updateDiary}
-          className="w-full py-6"
+          onClick={() => updateDiary()}
+          className="w-full py-6 bg-rose-600 shadow-rose text-white rounded-full normal-case"
         >
-          submit
+          Submit
         </Mui.Button>
       </div>
       <Mui.Backdrop open={!!imgSel} className="z-10">
@@ -258,6 +285,14 @@ const Entry = () => {
           </Mui.Button>
         </Mui.DialogActions>
       </Mui.Dialog>
+      <Mui.Backdrop open={loading} className="z-10">
+        <div className="animate-bounce">
+          <Mui.CircularProgress
+            color="inherit"
+            className="text-rose-600 shadow-pop-rose rounded-full"
+          />
+        </div>
+      </Mui.Backdrop>
     </div>
   )
 }

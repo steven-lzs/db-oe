@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import * as Mui from '@material-ui/core'
-import { withStyles } from '@material-ui/core/styles'
 import { useHistory } from 'react-router-dom'
+import * as FaIcon from 'react-icons/fa'
+import { useSnackbar } from 'notistack'
 
 import user from 'api/user'
 
@@ -11,9 +12,10 @@ const initialState = {
 }
 
 const Login = () => {
+  const { enqueueSnackbar } = useSnackbar()
+
   const history = useHistory()
   const [{ email, password }, setState] = useState(initialState)
-  // const [error, setError] = useState('');
 
   const getDeviceType = () => {
     const ua = navigator.userAgent
@@ -43,65 +45,60 @@ const Login = () => {
       device_name: device,
     }
     user.login(param).then((resp) => {
-      console.log(resp)
       if (resp.status === 200) {
         localStorage.setItem('token', resp.data)
-        history.push('/Overview')
+        history.push('/overview')
         setState({ ...initialState })
       }
 
-      // if(resp.errors) {
-      //   setError('Invalid fields');
-      // }
+      if (resp.errors) {
+        const errors = resp.errors
+        for (const key in errors) {
+          enqueueSnackbar(errors[key], { variant: 'error' })
+        }
+      }
     })
   }
-
-  const ValidationTextField = withStyles({
-    root: {
-      '& fieldset': {
-        borderRadius: '10px',
-        borderStyle: 'hidden',
-        boxShadow: 'inset 5px 5px 10px black',
-        '& legend span': {
-          display: 'none',
-        },
-      },
-    },
-  })(Mui.TextField)
 
   return (
     <div className="text-center table w-full h-full">
       <div className="table-cell align-middle w-full h-full">
         <div className="mb-6">
-          <Mui.TextField
-            value={email}
-            name="email"
-            placeholder="Email"
-            variant="outlined"
-            onChange={onChange}
-          />
+          <div className="bg-gray-900 inline-flex p-3 rounded-full">
+            <div className="bg-gray-600 p-2 rounded-full mr-2">
+              <FaIcon.FaUserAlt className="text-lg text-gray-900" />
+            </div>
+            <Mui.InputBase
+              value={email}
+              name="email"
+              placeholder="Email"
+              onChange={onChange}
+            />
+          </div>
         </div>
         <div className="mb-6">
-          <Mui.TextField
-            value={password}
-            placeholder="Password"
-            name="password"
-            type="password"
-            variant="outlined"
-            onChange={onChange}
-          />
+          <div className="bg-gray-900 inline-flex p-3 rounded-full">
+            <div className="bg-gray-600 p-2 rounded-full mr-2">
+              <FaIcon.FaKey className="text-lg text-gray-900" />
+            </div>
+            <Mui.InputBase
+              value={password}
+              placeholder="Password"
+              name="password"
+              type="password"
+              onChange={onChange}
+            />
+          </div>
         </div>
-
-        <Mui.Button variant="contained" color="primary" onClick={login}>
-          Login
-        </Mui.Button>
-        {/* {<Mui.Snackbar anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'center',
-        }}
-        autoHideDuration={3000} 
-        open={!!error} message={error}>
-        </Mui.Snackbar>} */}
+        <div>
+          <Mui.Button
+            variant="contained"
+            onClick={login}
+            className="normal-case w-52 rounded-full py-3 bg-rose-600 shadow-rose text-white"
+          >
+            Login
+          </Mui.Button>
+        </div>
       </div>
     </div>
   )

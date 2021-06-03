@@ -16,11 +16,14 @@ const View = () => {
   const [content, setContent] = useState('')
   const [file_, setFile_] = useState([])
   const [imgSel, setImgSel] = useState('')
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (!!props) {
+      setLoading(true)
       diary.getDiaryById(props).then(({ data }) => {
         console.log('get a diary ', data)
+        setLoading(false)
         setTitle(data.title)
         setDatetime(moment(data.datetime).format('yyyy-MM-DD HH:mmA dddd'))
         setContent(data.content)
@@ -54,15 +57,20 @@ const View = () => {
   return (
     <>
       <div className="table w-full h-full md:p-10 p-4">
-        <Mui.Button variant="contained" color="primary" onClick={goBack}>
-          Back
-        </Mui.Button>
+        <div className="border-2 border-rose-600 rounded-full shadow-pop-rose inline-block">
+          <Mui.Button
+            className="normal-case text-white px-8 py-2 rounded-full"
+            onClick={goBack}
+          >
+            Back
+          </Mui.Button>
+        </div>
         <div className="text-center mb-10">
           <div className="py-6 font-bold text-xl">{title}</div>
           <div>{datetime}</div>
         </div>
         {content && (
-          <div className="border rounded-lg whitespace-pre-line p-2 leading-relaxed">
+          <div className="bg-gray-800 rounded-lg whitespace-pre-line p-2 leading-relaxed">
             {content}
           </div>
         )}
@@ -102,6 +110,14 @@ const View = () => {
             onClick={() => setImgSel('')}
           />
           {imgSel}
+        </Mui.Backdrop>
+        <Mui.Backdrop open={loading} className="z-10">
+          <div className="animate-bounce">
+            <Mui.CircularProgress
+              color="inherit"
+              className="text-rose-600 shadow-pop-rose rounded-full"
+            />
+          </div>
         </Mui.Backdrop>
       </div>
     </>
