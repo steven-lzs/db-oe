@@ -63,7 +63,7 @@ const Overview = () => {
       <div className="table w-full h-full">
         <div className="py-6 font-bold text-xl text-center">Overview</div>
         <Mui.Button
-          className="absolute right-8 top-8 normal-case rounded-full py-3 bg-rose-600 shadow-rose text-white"
+          className="absolute right-8 top-8 normal-case rounded-full py-3 bg-rose-600 shadow-rose text-white font-sans"
           variant="contained"
           color="primary"
           onClick={() => logout()}
@@ -96,7 +96,7 @@ const Overview = () => {
                                 gutterBottom
                                 component="h5"
                                 variant="h5"
-                                className="line-clamp-1 font-bold"
+                                className="line-clamp-1 font-bold font-sans"
                               >
                                 {title ? title : ''}
                               </Mui.Typography>
@@ -104,7 +104,7 @@ const Overview = () => {
                                 gutterBottom
                                 variant="body2"
                                 component="p"
-                                className="line-clamp-3"
+                                className="line-clamp-3 font-sans"
                               >
                                 {content} ...
                               </Mui.Typography>
@@ -135,8 +135,9 @@ const Overview = () => {
                                 onClick={() =>
                                   editOrView('edit', { id, diary_id })
                                 }
+                                className="font-sans normal-case"
                               >
-                                edit
+                                EDIT
                               </Mui.Button>
                               <Mui.Button
                                 size="medium"
@@ -144,8 +145,9 @@ const Overview = () => {
                                 onClick={() =>
                                   editOrView('view', { id, diary_id })
                                 }
+                                className="font-sans normal-case"
                               >
-                                view
+                                VIEW
                               </Mui.Button>
                             </Mui.CardActions>
                           )}

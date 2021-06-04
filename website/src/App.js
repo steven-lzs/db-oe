@@ -16,7 +16,7 @@ const App = () => {
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-      <div className="App">
+      <div className="App font-sans">
         <Main />
       </div>
     </ThemeProvider>

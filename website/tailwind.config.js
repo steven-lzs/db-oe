@@ -81,7 +81,7 @@ module.exports = {
         '-1': '-1',
       },
       fontFamily: {
-        sans: ['Raleway', ...defaultTheme.fontFamily.sans],
+        sans: ['"ZCOOL KuaiLe"', ...defaultTheme.fontFamily.sans],
       },
     },
   },

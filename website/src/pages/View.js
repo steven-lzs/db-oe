@@ -59,7 +59,7 @@ const View = () => {
       <div className="table w-full h-full md:p-10 p-4">
         <div className="border-2 border-rose-600 rounded-full shadow-pop-rose inline-block">
           <Mui.Button
-            className="normal-case text-white px-8 py-2 rounded-full"
+            className="normal-case text-white px-8 py-2 rounded-full font-sans"
             onClick={goBack}
           >
             Back
@@ -104,14 +104,20 @@ const View = () => {
             })}
           </div>
         </div>
-        <Mui.Backdrop open={!!imgSel} className="z-10">
+        <Mui.Backdrop
+          open={!!imgSel}
+          className="z-10 backdrop-filter backdrop-blur-sm"
+        >
           <FaIcon.FaTimesCircle
             className="text-4xl cursor-pointer absolute top-8 right-8"
             onClick={() => setImgSel('')}
           />
           {imgSel}
         </Mui.Backdrop>
-        <Mui.Backdrop open={loading} className="z-10">
+        <Mui.Backdrop
+          open={loading}
+          className="z-10 backdrop-filter backdrop-blur-sm"
+        >
           <div className="animate-bounce">
             <Mui.CircularProgress
               color="inherit"

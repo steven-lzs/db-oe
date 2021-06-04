@@ -136,7 +136,7 @@ const Entry = () => {
       <div className="flex justify-between">
         <div className="border-2 border-rose-600 rounded-full shadow-pop-rose">
           <Mui.Button
-            className="normal-case text-white px-8 py-2 rounded-full"
+            className="normal-case text-white px-8 py-2 rounded-full font-sans"
             onClick={goBack}
           >
             Back
@@ -146,7 +146,7 @@ const Entry = () => {
           <Mui.Button
             variant="contained"
             onClick={() => setConfirmDelete(true)}
-            className="normal-case rounded-full py-3 px-8 bg-rose-600 shadow-rose text-white"
+            className="normal-case rounded-full py-3 px-8 bg-rose-600 shadow-rose text-white font-sans"
           >
             Delete
           </Mui.Button>
@@ -166,7 +166,7 @@ const Entry = () => {
             InputLabelProps={{
               shrink: true,
             }}
-            className="w-full"
+            className="w-full font-sans"
             onChange={(e) => setDatetime(e.target.value)}
           />
         </div>
@@ -178,7 +178,7 @@ const Entry = () => {
             value={title}
             variant="outlined"
             multiline
-            className="w-full"
+            className="w-full font-sans"
             onChange={(e) => setTitle(e.target.value)}
           />
         </div>
@@ -189,7 +189,7 @@ const Entry = () => {
           <Mui.TextareaAutosize
             ref={inputRef}
             aria-label="Content"
-            className="text-white w-full bg-transparent rounded-lg overflow-y-scroll"
+            className="text-white w-full bg-transparent rounded-lg overflow-y-scroll text-lg"
             rowsMin={10}
             value={content}
             onChange={(e) => setContent(e.target.value)}
@@ -243,7 +243,11 @@ const Entry = () => {
           )}
         </div>
         <div className="text-right">
-          <Mui.Button variant="contained" component="label">
+          <Mui.Button
+            variant="contained"
+            component="label"
+            className="font-sans"
+          >
             Upload File
             <input
               type="file"
@@ -260,12 +264,15 @@ const Entry = () => {
           variant="contained"
           color="primary"
           onClick={() => updateDiary()}
-          className="w-full py-6 bg-rose-600 shadow-rose text-white rounded-full normal-case"
+          className="w-full py-6 bg-rose-600 shadow-rose text-white rounded-full normal-case font-sans"
         >
           Submit
         </Mui.Button>
       </div>
-      <Mui.Backdrop open={!!imgSel} className="z-10">
+      <Mui.Backdrop
+        open={!!imgSel}
+        className="z-10 backdrop-filter backdrop-blur-sm"
+      >
         <FaIcon.FaTimesCircle
           className="text-4xl cursor-pointer absolute top-8 right-8"
           onClick={() => setImgSel('')}
@@ -285,7 +292,10 @@ const Entry = () => {
           </Mui.Button>
         </Mui.DialogActions>
       </Mui.Dialog>
-      <Mui.Backdrop open={loading} className="z-10">
+      <Mui.Backdrop
+        open={loading}
+        className="z-10 backdrop-filter backdrop-blur-sm"
+      >
         <div className="animate-bounce">
           <Mui.CircularProgress
             color="inherit"

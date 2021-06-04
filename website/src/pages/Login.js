@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import * as Mui from '@material-ui/core'
 import { useHistory } from 'react-router-dom'
 import * as FaIcon from 'react-icons/fa'
@@ -37,6 +37,13 @@ const Login = () => {
     setState((prevState) => ({ ...prevState, [name]: value }))
   }
 
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    if (token) {
+      history.push('/overview')
+    }
+  }, [])
+
   const login = () => {
     const device = getDeviceType()
     const param = {
@@ -73,6 +80,7 @@ const Login = () => {
               name="email"
               placeholder="Email"
               onChange={onChange}
+              className="font-sans"
             />
           </div>
         </div>
@@ -87,6 +95,7 @@ const Login = () => {
               name="password"
               type="password"
               onChange={onChange}
+              className="font-sans"
             />
           </div>
         </div>
@@ -94,7 +103,7 @@ const Login = () => {
           <Mui.Button
             variant="contained"
             onClick={login}
-            className="normal-case w-52 rounded-full py-3 bg-rose-600 shadow-rose text-white"
+            className="normal-case w-52 rounded-full py-3 bg-rose-600 shadow-rose text-white font-sans"
           >
             Login
           </Mui.Button>
