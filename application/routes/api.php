@@ -21,6 +21,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/logout', 'UserController@logout');
     });
 
+    Route::group(['namespace' => 'Main', 'prefix' => 'main'],function () {
+        Route::post('/getMenu', 'MainController@getMenu');
+    });
+
     Route::group(['namespace' => 'Diary', 'prefix' => 'diary'], function () {
         Route::post('/updateDiary', 'DiaryController@updateDiary');
         Route::post('/getDiary', 'DiaryController@getDiary');

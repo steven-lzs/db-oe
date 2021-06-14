@@ -1,15 +1,18 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, useLayoutEffect } from 'react'
 import diary from 'api/diary'
 import * as Mui from '@material-ui/core'
 import * as FaIcon from 'react-icons/fa'
 import moment from 'moment'
 import { useSnackbar } from 'notistack'
+import { observer } from 'mobx-react'
+import store from '../../store'
 
 import { useHistory, useLocation } from 'react-router-dom'
+import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock'
 
 import Picker, { SKIN_TONE_NEUTRAL } from 'emoji-picker-react'
 
-const Entry = () => {
+const Entry = ({ outerWrapper }) => {
   const { enqueueSnackbar } = useSnackbar()
   const history = useHistory()
 
@@ -22,6 +25,7 @@ const Entry = () => {
   const [imgSel, setImgSel] = useState('')
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [loading, setLoading] = useState(false)
+  const appRef = document.querySelector('.App')
 
   const onEmojiClick = (event, emojiObject) => {
     const { selectionStart, selectionEnd } = inputRef.current
@@ -68,6 +72,8 @@ const Entry = () => {
   }
 
   useEffect(() => {
+    // make change in store when page change to re-render the page height in App.js
+    store.setPage('Entry without props')
     if (!!props) {
       setLoading(true)
       diary.getDiaryById(props).then(({ data }) => {
@@ -77,6 +83,8 @@ const Entry = () => {
         setDatetime(moment(data.datetime).format('yyyy-MM-DDTHH:mm'))
         setContent(data.content)
         setFile_(data.docs)
+
+        store.setPage('Entry with props')
       })
     }
   }, [])
@@ -131,8 +139,27 @@ const Entry = () => {
     )
   }
 
+  useLayoutEffect(() => {
+    if (imgSel) {
+      disableBodyScroll(appRef)
+      outerWrapper.current.style.touchAction = 'none';
+    } else {
+      enableBodyScroll(appRef)
+      outerWrapper.current.style.touchAction = 'auto';
+    }
+  }, [imgSel])
+
+  const setImage = (e) => {
+    setImgSel(
+      <div
+        className="h-full w-full bg-contain bg-no-repeat bg-center"
+        style={{ backgroundImage: 'url(' + e + ')' }}
+      ></div>
+    )
+  }
+
   return (
-    <div className="table w-full h-full p-10">
+    <div className="table w-full h-full p-10 font-sans">
       <div className="flex justify-between">
         <div className="border-2 border-rose-600 rounded-full shadow-pop-rose">
           <Mui.Button
@@ -212,7 +239,7 @@ const Entry = () => {
                   {f.type?.indexOf('image') != -1 ? (
                     <div
                       className="col-span-11 cursor-pointer"
-                      onClick={() => setImgSel(f.base64)}
+                      onClick={() => setImage(f.base64)}
                     >
                       <img src={f.base64} />
                     </div>
@@ -277,7 +304,7 @@ const Entry = () => {
           className="text-4xl cursor-pointer absolute top-8 right-8"
           onClick={() => setImgSel('')}
         />
-        <img src={imgSel} />
+        {imgSel}
       </Mui.Backdrop>
       <Mui.Dialog open={confirmDelete}>
         <Mui.DialogContent>
@@ -292,10 +319,7 @@ const Entry = () => {
           </Mui.Button>
         </Mui.DialogActions>
       </Mui.Dialog>
-      <Mui.Backdrop
-        open={loading}
-        className="z-10 backdrop-filter backdrop-blur-sm"
-      >
+      <Mui.Backdrop open={loading} className="z-10 bg-transparent">
         <div className="animate-bounce">
           <Mui.CircularProgress
             color="inherit"
@@ -307,4 +331,4 @@ const Entry = () => {
   )
 }
 
-export default Entry
+export default observer(Entry)

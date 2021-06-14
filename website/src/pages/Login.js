@@ -3,8 +3,11 @@ import * as Mui from '@material-ui/core'
 import { useHistory } from 'react-router-dom'
 import * as FaIcon from 'react-icons/fa'
 import { useSnackbar } from 'notistack'
+import gsap from 'gsap'
 
 import user from 'api/user'
+
+const tl = gsap.timeline()
 
 const initialState = {
   email: '',
@@ -40,8 +43,21 @@ const Login = () => {
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (token) {
-      history.push('/overview')
+      history.push('/main')
     }
+  }, [])
+
+  useEffect(() => {
+    tl.from('.input', 1, {
+      css: { scale: 0.05, opacity: 0 },
+      ease: 'power4.out',
+      stagger: {
+        amount: 0.4,
+      },
+    }).from('.login_btn', 0.5, {
+      css: { scale: 0.05, opacity: 0 },
+      ease: 'power4.out',
+    })
   }, [])
 
   const login = () => {
@@ -53,9 +69,22 @@ const Login = () => {
     }
     user.login(param).then((resp) => {
       if (resp.status === 200) {
-        localStorage.setItem('token', resp.data)
-        history.push('/overview')
-        setState({ ...initialState })
+        tl.to('.input', 1, {
+          css: { scale: 0, opacity: 0 },
+          ease: 'power4.out',
+          stagger: {
+            amount: 0.4,
+          },
+        }).to('.login_btn', 1, {
+          css: { scale: 0, opacity: 0 },
+          ease: 'power4.out',
+          delay: -0.6,
+          onComplete: () => {
+            localStorage.setItem('token', resp.data)
+            history.push('/main')
+            setState({ ...initialState })
+          },
+        })
       }
 
       if (resp.errors) {
@@ -69,9 +98,17 @@ const Login = () => {
 
   return (
     <div className="text-center table w-full h-full">
+      {/* <div className="border-2 border-rose-600 rounded-full shadow-pop-rose absolute top-10 left-10">
+        <Mui.Button
+          className="normal-case text-white px-8 py-2 rounded-full font-sans"
+          onClick={() => goToMain()}
+        >
+          Back
+        </Mui.Button>
+      </div> */}
       <div className="table-cell align-middle w-full h-full">
         <div className="mb-6">
-          <div className="bg-gray-900 inline-flex p-3 rounded-full">
+          <div className="bg-gray-900 inline-flex p-3 rounded-full input">
             <div className="bg-gray-600 p-2 rounded-full mr-2">
               <FaIcon.FaUserAlt className="text-lg text-gray-900" />
             </div>
@@ -80,12 +117,11 @@ const Login = () => {
               name="email"
               placeholder="Email"
               onChange={onChange}
-              className="font-sans"
             />
           </div>
         </div>
         <div className="mb-6">
-          <div className="bg-gray-900 inline-flex p-3 rounded-full">
+          <div className="bg-gray-900 inline-flex p-3 rounded-full input">
             <div className="bg-gray-600 p-2 rounded-full mr-2">
               <FaIcon.FaKey className="text-lg text-gray-900" />
             </div>
@@ -95,7 +131,6 @@ const Login = () => {
               name="password"
               type="password"
               onChange={onChange}
-              className="font-sans"
             />
           </div>
         </div>
@@ -103,7 +138,7 @@ const Login = () => {
           <Mui.Button
             variant="contained"
             onClick={login}
-            className="normal-case w-52 rounded-full py-3 bg-rose-600 shadow-rose text-white font-sans"
+            className="normal-case w-52 rounded-full py-3 bg-rose-600 shadow-rose text-white login_btn"
           >
             Login
           </Mui.Button>

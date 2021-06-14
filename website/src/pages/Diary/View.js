@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useLayoutEffect } from 'react'
 import diary from 'api/diary'
 import * as Mui from '@material-ui/core'
 import * as FaIcon from 'react-icons/fa'
 import moment from 'moment'
+import { observer } from 'mobx-react'
+import store from '../../store'
 
 import { useHistory, useLocation } from 'react-router-dom'
-import user from 'api/user'
+import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock'
 
-const View = () => {
+const View = ({ outerWrapper }) => {
   const history = useHistory()
   let { state: props } = useLocation()
 
@@ -17,6 +19,7 @@ const View = () => {
   const [file_, setFile_] = useState([])
   const [imgSel, setImgSel] = useState('')
   const [loading, setLoading] = useState(false)
+  const appRef = document.querySelector('.App')
 
   useEffect(() => {
     if (!!props) {
@@ -28,9 +31,21 @@ const View = () => {
         setDatetime(moment(data.datetime).format('yyyy-MM-DD HH:mmA dddd'))
         setContent(data.content)
         setFile_(data.docs)
+        // make change in store when page change to re-render the page height in App.js
+        store.setPage('View')
       })
     }
   }, [])
+
+  useLayoutEffect(() => {
+    if (imgSel) {
+      disableBodyScroll(appRef)
+      outerWrapper.current.style.touchAction = 'none';
+    } else {
+      enableBodyScroll(appRef)
+      outerWrapper.current.style.touchAction = 'auto';
+    }
+  }, [imgSel])
 
   const goBack = () => history.goBack()
 
@@ -39,7 +54,7 @@ const View = () => {
       <div
         className="h-full w-full bg-contain bg-no-repeat bg-center"
         style={{ backgroundImage: 'url(' + e + ')' }}
-      ></div>,
+      ></div>
     )
   }
 
@@ -56,7 +71,7 @@ const View = () => {
 
   return (
     <>
-      <div className="table w-full h-full md:p-10 p-4">
+      <div className="table w-full h-full md:p-10 p-4 font-sans">
         <div className="border-2 border-rose-600 rounded-full shadow-pop-rose inline-block">
           <Mui.Button
             className="normal-case text-white px-8 py-2 rounded-full font-sans"
@@ -66,7 +81,14 @@ const View = () => {
           </Mui.Button>
         </div>
         <div className="text-center mb-10">
-          <div className="py-6 font-bold text-xl">{title}</div>
+          <Mui.Typography
+            gutterBottom
+            component="h5"
+            variant="h5"
+            className="line-clamp-1 font-bold font-sans"
+          >
+            {title}
+          </Mui.Typography>
           <div>{datetime}</div>
         </div>
         {content && (
@@ -114,10 +136,7 @@ const View = () => {
           />
           {imgSel}
         </Mui.Backdrop>
-        <Mui.Backdrop
-          open={loading}
-          className="z-10 backdrop-filter backdrop-blur-sm"
-        >
+        <Mui.Backdrop open={loading} className="z-10 bg-transparent">
           <div className="animate-bounce">
             <Mui.CircularProgress
               color="inherit"
@@ -130,4 +149,4 @@ const View = () => {
   )
 }
 
-export default View
+export default observer(View)
