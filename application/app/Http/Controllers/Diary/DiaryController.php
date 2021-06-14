@@ -101,13 +101,15 @@ class DiaryController extends Controller
             if($docs){
                 foreach($docs as $doc){
                     $path = public_path() . '/storage/' . $doc;
-                    $type = mime_content_type($path);
-                    if(strpos($type, 'image') !== false){
-                        $data = file_get_contents($path);
-                        $base64 = 'data:' . $type . ';base64,' . base64_encode($data);
+                    if(File::exists($path)) {
+                        $type = mime_content_type($path);
+                        if(strpos($type, 'image') !== false){
+                            $data = file_get_contents($path);
+                            $base64 = 'data:' . $type . ';base64,' . base64_encode($data);
 
-                        $res->docs = $base64;
-                        break;
+                            $res->docs = $base64;
+                            break;
+                        }
                     }
                 }
             } else {
@@ -180,16 +182,18 @@ class DiaryController extends Controller
                 if(count($docs) > 0){
                     foreach($docs as $doc){
                         $path = public_path() . '/storage/' . $doc;
-                        $type = mime_content_type($path);
-                        $data = file_get_contents($path);
-                        $base64 = 'data:' . $type . ';base64,' . base64_encode($data);
+                        if(File::exists($path)) {
+                            $type = mime_content_type($path);
+                            $data = file_get_contents($path);
+                            $base64 = 'data:' . $type . ';base64,' . base64_encode($data);
 
-                        array_push($doc_arr, array(
-                            'type' => $type,
-                            'name' => str_replace($result->diary_id . '_', '', $doc),
-                            'ori_name' => $doc,
-                            'base64' => $base64
-                        ));
+                            array_push($doc_arr, array(
+                                'type' => $type,
+                                'name' => str_replace($result->diary_id . '_', '', $doc),
+                                'ori_name' => $doc,
+                                'base64' => $base64
+                            ));
+                        }
                     }
                 }
                 

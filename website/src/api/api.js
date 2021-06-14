@@ -49,12 +49,12 @@ BaseApi.interceptors.response.use(
   },
   function (error) {
     if (error.response.status === 401) {
-      window.location.href = '/login'
+      window.location.href = '/'
       return error.response
     }
     if (error.response.status === 429) {
       console.log('Too many requests.')
-      window.location.href = '/login'
+      window.location.href = '/'
     }
     if (error.response.status === 403) {
       // window.location.href = "/login";

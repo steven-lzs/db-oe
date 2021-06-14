@@ -4,11 +4,23 @@ import './index.css'
 import App from './App'
 import reportWebVitals from './reportWebVitals'
 import { BrowserRouter as Router } from 'react-router-dom'
+import { SnackbarProvider } from 'notistack'
+import Grow from '@material-ui/core/Grow'
 
 ReactDOM.render(
   <React.StrictMode>
     <Router>
-      <App />
+      <SnackbarProvider
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+        TransitionComponent={Grow}
+        maxSnack={2}
+        autoHideDuration={2500}
+      >
+        <App />
+      </SnackbarProvider>
     </Router>
   </React.StrictMode>,
   document.getElementById('root'),
