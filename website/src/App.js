@@ -37,14 +37,15 @@ const App = () => {
   //   lerp: (a, b, n) => (1 - n) * a + n * b
   // };
 
-  // useEffect(() => {
-  //   if (scrollContainer.current) {
-  //     document.body.style.height = `${
-  //       scrollContainer.current.getBoundingClientRect().height
-  //     }px`
-  //   }
-  //   // window.scrollTo(0, 0)
-  // }, [size.height, store.page])
+  useEffect(() => {
+    // if (scrollContainer.current) {
+    //   document.body.style.height = `${
+    //     scrollContainer.current.getBoundingClientRect().height
+    //   }px`
+    // }
+
+    window.scrollTo(0, 0)
+  }, [store.page])
 
   // // Run scrollrender once page is loaded.
   // useEffect(() => {
@@ -86,8 +87,15 @@ const App = () => {
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       {/* <div ref={app} className="App"> */}
-      <div ref={app} className="App" >
+      <div ref={app} className="App md:p-6 p-2">
         {/* <Wrapper forwardedRef={scrollContainer} /> */}
+        <ul className="flex fixed z-30 w-full top-0 left-0 m-0 pointer-events-none transition">
+          <li className="bg-gray-800"></li>
+          <li className="bg-gray-700"></li>
+          <li className="bg-gray-600"></li>
+          <li className="bg-gray-500"></li>
+          <li className="bg-gray-400"></li>
+        </ul>
         <Wrapper outerWrapper={app} />
       </div>
     </ThemeProvider>

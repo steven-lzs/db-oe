@@ -11,13 +11,12 @@ import store from '../../store'
 
 import { useHistory } from 'react-router-dom'
 
-const tl = gsap.timeline();
+const tl = gsap.timeline()
 
 const Overview = ({ outerWrapper }) => {
   const history = useHistory()
   const card = useRef([])
   const cardCont = useRef([])
-  const appRef = document.querySelector('.App')
 
   const toNewEntry = (state = null) => {
     history.push({ pathname: '/diary/entry', state })
@@ -60,27 +59,23 @@ const Overview = ({ outerWrapper }) => {
     // console.log(card.current[3].getBoundingClientRect())
     // offsetTop is the distance from most top  in the screen to the element
     // getBoundingClientRect is the distance from the current viewport to the element
-    const top =
-      card.current[param.index].offsetTop -
-      card.current[param.index].getBoundingClientRect().y
+    // const top =
+    //   card.current[param.index].offsetTop -
+    //   card.current[param.index].getBoundingClientRect().y
 
-    disableBodyScroll(appRef);
-    outerWrapper.current.style.touchAction = 'none';
+    disableBodyScroll(outerWrapper.current)
+    if (store.isIOS) {
+      outerWrapper.current.style.touchAction = 'none'
+    }
     tl.to(`.diary-content-${param.id}`, 0.4, {
       css: { opacity: 0 },
-      ease: 'power4.Out',
+      ease: 'power4.out',
     })
-      .to(`.diary-overlay-${param.id}`, 0.4, {
-        css: {
-          zIndex: '100',
-          height: '100vh',
-          width: '100vw',
-          top,
-          left: -cardCont.current[param.index].getBoundingClientRect().left,
-          opacity: 1,
-          backgroundColor: '#303030',
-        },
-        ease: 'power3.Out',
+      .to('ul.transition li', {
+        duration: 0.5,
+        scaleY: 1,
+        transformOrigin: 'bottom left',
+        stagger: 0.2,
         onComplete: () => {
           if (type == 'edit') {
             toNewEntry(param)
@@ -88,26 +83,103 @@ const Overview = ({ outerWrapper }) => {
           if (type == 'view') {
             toView(param)
           }
-          enableBodyScroll(appRef)
-          outerWrapper.current.style.touchAction = 'auto';
+          enableBodyScroll(outerWrapper.current)
+          if (store.isIOS) {
+            outerWrapper.current.style.touchAction = 'auto'
+          }
         },
+      })
+      .to('ul.transition li', {
+        duration: 0.5,
+        scaleY: 0,
+        transformOrigin: 'bottom left',
+        stagger: 0.1,
+        delay: 0.1,
+      })
+    // .to(`.diary-overlay-${param.id}`, 2, {
+    //   css: {
+    //     zIndex: '100',
+    //     height: '100vh',
+    //     width: '100vw',
+    //     top,
+    //     left: -cardCont.current[param.index].getBoundingClientRect().left,
+    //     opacity: 1,
+    //     backgroundColor: '#303030',
+    //   },
+    //   ease: 'power4.out',
+    //   onComplete: () => {
+    //     if (type == 'edit') {
+    //       toNewEntry(param)
+    //     }
+    //     if (type == 'view') {
+    //       toView(param)
+    //     }
+    //     enableBodyScroll(outerWrapper.current)
+    //     if (store.isIOS) {
+    //       outerWrapper.current.style.touchAction = 'auto'
+    //     }
+    //   },
+    // })
+  }
+
+  const cardSelected = (id) => {
+    setOpenEditOrView((prevState) => {
+      if (prevState) {
+        tl.to(`.diary-content-${prevState}`, 0.6, {
+          filter: 'blur(0px)',
+          ease: 'power4.out',
+          delay: -0.6,
+        })
+          .to(`.card-actions-btn-${prevState}`, 0.8, {
+            scale: 0,
+            ease: 'power4.out',
+            delay: -0.6,
+          })
+          .to(`.card-actions-${prevState}`, 0.8, {
+            height: '0px',
+            ease: 'power4.out',
+            delay: -0.6,
+          })
+      }
+
+      if (prevState === id) {
+        return ''
+      } else {
+        return id
+      }
+    })
+
+    tl.to(`.diary-content-${id}`, 0.6, {
+      filter: 'blur(5px)',
+      ease: 'power4.in',
+      delay: -0.3,
+    })
+      .to(`.card-actions-${id}`, 1, {
+        height: '50px',
+        ease: 'elastic.out(1,0.4)',
+        delay: -0.3,
+      })
+      .to(`.card-actions-btn-${id}`, 1, {
+        scale: 1,
+        ease: 'elastic.out(1,0.4)',
+        delay: -0.3,
       })
   }
 
   return (
     <div className="overview" style={{ visibility: 'hidden' }}>
       <div className="table w-full h-full">
-        <div className="py-6 font-bold text-xl text-center g-fade-in font-sans">
-          Overview
-        </div>
         <Mui.Button
-          className="absolute right-8 top-8 normal-case rounded-full py-3 bg-rose-600 shadow-rose text-white font-sans g-fade-in"
+          className=" normal-case rounded-full py-3 bg-rose-600 shadow-rose text-white font-sans g-fade-in"
           variant="contained"
           color="primary"
           onClick={() => backToMain()}
         >
           Back to Main
         </Mui.Button>
+        <div className="py-6 font-bold text-xl text-center g-fade-in font-sans">
+          Overview
+        </div>
         <div className="mb-6">
           <div className="grid-cols-12 md:grid gap-4 g-fade-in">
             <div className="col-span-12 ml-2 g-fade-in font-sans">
@@ -134,30 +206,23 @@ const Overview = ({ outerWrapper }) => {
                             width: '100%',
                             height: '100%',
                             backgroundColor: '#424242',
-                            padding: '16px',
                           }}
-                          onClick={() =>
-                            setOpenEditOrView((prevState) =>
-                              prevState === id ? '' : id,
-                            )
-                          }
+                          onClick={() => cardSelected(id)}
                         ></div>
                         <Zoom>
                           <Mui.Card
                             className={
-                              'shadow-none h-full rounded-lg diary-' + id
+                              'cursor-pointer shadow-none h-full rounded-lg diary-' +
+                              id
                             }
                             ref={(el) => (card.current[index] = el)}
-                            onClick={() =>
-                              setOpenEditOrView((prevState) =>
-                                prevState === id ? '' : id,
-                              )
-                            }
+                            onClick={() => cardSelected(id)}
                           >
                             <Mui.CardContent
                               className={
                                 'grid-cols-12 grid gap-2 diary-content-' + id
                               }
+                              style={{ filter: 'blur(0)' }}
                             >
                               <div
                                 className={img ? 'col-span-8' : 'col-span-12'}
@@ -198,30 +263,40 @@ const Overview = ({ outerWrapper }) => {
                                 style={{ backgroundImage: 'url(' + img + ')' }}
                               ></div>
                             </Mui.CardContent>
-                            {openEditOrView === id && (
-                              <Mui.CardActions className="flex justify-between">
-                                <Mui.Button
-                                  size="medium"
-                                  color="secondary"
-                                  onClick={() =>
-                                    editOrView('edit', { id, diary_id, index })
-                                  }
-                                  className="font-sans normal-case"
-                                >
-                                  EDIT
-                                </Mui.Button>
-                                <Mui.Button
-                                  size="medium"
-                                  color="secondary"
-                                  onClick={() =>
-                                    editOrView('view', { id, diary_id, index })
-                                  }
-                                  className="font-sans normal-case"
-                                >
-                                  VIEW
-                                </Mui.Button>
-                              </Mui.CardActions>
-                            )}
+
+                            <Mui.CardActions
+                              className={
+                                'flex justify-between card-actions-' + id
+                              }
+                              style={{ height: 0 }}
+                            >
+                              <Mui.Button
+                                size="medium"
+                                color="secondary"
+                                onClick={() =>
+                                  editOrView('edit', { id, diary_id, index })
+                                }
+                                className={
+                                  'font-sans normal-case card-actions-btn-' + id
+                                }
+                                style={{ transform: 'scale(0)' }}
+                              >
+                                EDIT
+                              </Mui.Button>
+                              <Mui.Button
+                                size="medium"
+                                color="secondary"
+                                onClick={() =>
+                                  editOrView('view', { id, diary_id, index })
+                                }
+                                className={
+                                  'font-sans normal-case card-actions-btn-' + id
+                                }
+                                style={{ transform: 'scale(0)' }}
+                              >
+                                VIEW
+                              </Mui.Button>
+                            </Mui.CardActions>
                           </Mui.Card>
                         </Zoom>
                       </div>
