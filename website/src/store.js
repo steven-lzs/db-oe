@@ -4,7 +4,8 @@ import { makePersistable } from 'mobx-persist-store'
 class Store {
   page = ''
   scrollUntil = 0
-  scrollLock = false
+  cardClick = ''
+  isIOS = ['iPhone', 'iPad', 'iPod'].indexOf(window.navigator.platform) !== -1
 
   constructor() {
     makeAutoObservable(this)
@@ -25,8 +26,8 @@ class Store {
     this.scrollUntil = pos
   }
 
-  setScrollLock(e) {
-    this.scrollLock = e
+  setCardClick(card) {
+    this.cardClick = card
   }
 }
 

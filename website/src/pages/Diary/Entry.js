@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useLayoutEffect } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import diary from 'api/diary'
 import * as Mui from '@material-ui/core'
 import * as FaIcon from 'react-icons/fa'
@@ -6,11 +6,14 @@ import moment from 'moment'
 import { useSnackbar } from 'notistack'
 import { observer } from 'mobx-react'
 import store from '../../store'
+import gsap from 'gsap'
 
 import { useHistory, useLocation } from 'react-router-dom'
 import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock'
 
 import Picker, { SKIN_TONE_NEUTRAL } from 'emoji-picker-react'
+
+const tl = gsap.timeline()
 
 const Entry = ({ outerWrapper }) => {
   const { enqueueSnackbar } = useSnackbar()
@@ -24,8 +27,7 @@ const Entry = ({ outerWrapper }) => {
   const [file_, setFile_] = useState([])
   const [imgSel, setImgSel] = useState('')
   const [confirmDelete, setConfirmDelete] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const appRef = document.querySelector('.App')
+  // const [loading, setLoading] = useState(false)
 
   const onEmojiClick = (event, emojiObject) => {
     const { selectionStart, selectionEnd } = inputRef.current
@@ -40,7 +42,7 @@ const Entry = ({ outerWrapper }) => {
   let { state: props } = useLocation()
 
   const updateDiary = () => {
-    setLoading(true)
+    // setLoading(true)
     let datetime_ = datetime
       ? moment(datetime).format('yyyy-MM-DD HH:mm:ss')
       : ''
@@ -53,13 +55,13 @@ const Entry = ({ outerWrapper }) => {
     }
     console.log(param)
     diary.updateDiary(param).then((resp) => {
-      setLoading(false)
+      // setLoading(false)
       if (resp.status === 200) {
         setDatetime('')
         setContent('')
         setTitle('')
         setFile_([])
-        history.goBack()
+        goBack()
       }
 
       if (resp.errors) {
@@ -72,19 +74,17 @@ const Entry = ({ outerWrapper }) => {
   }
 
   useEffect(() => {
-    // make change in store when page change to re-render the page height in App.js
-    store.setPage('Entry without props')
     if (!!props) {
-      setLoading(true)
+      // setLoading(true)
       diary.getDiaryById(props).then(({ data }) => {
         console.log('get a diary ', data)
-        setLoading(false)
+        // setLoading(false)
         setTitle(data.title)
         setDatetime(moment(data.datetime).format('yyyy-MM-DDTHH:mm'))
         setContent(data.content)
         setFile_(data.docs)
-
-        store.setPage('Entry with props')
+        // make change in store when page change to re-render the page height in App.js
+        store.setPage('Entry')
       })
     }
   }, [])
@@ -110,14 +110,38 @@ const Entry = ({ outerWrapper }) => {
     }
   }
 
-  const goBack = () => history.goBack()
+  const goBack = () => {
+    disableBodyScroll(outerWrapper.current)
+    if (store.isIOS) {
+      outerWrapper.current.style.touchAction = 'none'
+    }
+    tl.to('ul.transition li', {
+      duration: 0.5,
+      scaleY: 1,
+      transformOrigin: 'bottom left',
+      stagger: 0.2,
+      onComplete: () => {
+        history.goBack()
+        enableBodyScroll(outerWrapper.current)
+        if (store.isIOS) {
+          outerWrapper.current.style.touchAction = 'auto'
+        }
+      },
+    }).to('ul.transition li', {
+      duration: 0.5,
+      scaleY: 0,
+      transformOrigin: 'bottom left',
+      stagger: 0.1,
+      delay: 0.1,
+    })
+  }
 
   const deleteEntry = () => {
-    setLoading(true)
+    // setLoading(true)
     diary.deleteEntry({ id: props.id }).then((resp) => {
       if (resp.status === 200) {
-        setLoading(false)
-        history.goBack()
+        // setLoading(false)
+        goBack()
       }
     })
   }
@@ -139,27 +163,29 @@ const Entry = ({ outerWrapper }) => {
     )
   }
 
-  useLayoutEffect(() => {
-    if (imgSel) {
-      disableBodyScroll(appRef)
-      outerWrapper.current.style.touchAction = 'none';
-    } else {
-      enableBodyScroll(appRef)
-      outerWrapper.current.style.touchAction = 'auto';
-    }
-  }, [imgSel])
-
   const setImage = (e) => {
-    setImgSel(
-      <div
-        className="h-full w-full bg-contain bg-no-repeat bg-center"
-        style={{ backgroundImage: 'url(' + e + ')' }}
-      ></div>
-    )
+    if (e === '') {
+      enableBodyScroll(outerWrapper.current)
+      if (store.isIOS) {
+        outerWrapper.current.style.touchAction = 'auto'
+      }
+      setImgSel(e)
+    } else {
+      disableBodyScroll(outerWrapper.current)
+      if (store.isIOS) {
+        outerWrapper.current.style.touchAction = 'none'
+      }
+      setImgSel(
+        <div
+          className="h-full w-full bg-contain bg-no-repeat bg-center"
+          style={{ backgroundImage: 'url(' + e + ')' }}
+        ></div>,
+      )
+    }
   }
 
   return (
-    <div className="table w-full h-full p-10 font-sans">
+    <div className="table w-full h-full font-sans">
       <div className="flex justify-between">
         <div className="border-2 border-rose-600 rounded-full shadow-pop-rose">
           <Mui.Button
@@ -223,13 +249,15 @@ const Entry = ({ outerWrapper }) => {
           />
         </div>
       </div>
-      <div className="mb-6">
-        <Picker
-          onEmojiClick={onEmojiClick}
-          skinTone={SKIN_TONE_NEUTRAL}
-          pickerStyle={{ width: '100%' }}
-        />
-      </div>
+      {store.isIOS && (
+        <div className="mb-6">
+          <Picker
+            onEmojiClick={onEmojiClick}
+            skinTone={SKIN_TONE_NEUTRAL}
+            pickerStyle={{ width: '100%' }}
+          />
+        </div>
+      )}
       <div className="mb-12">
         <div className="border-dashed border rounded-lg p-4 mb-2 grid md:grid-cols-12 gap-4">
           {file_.length > 0 ? (
@@ -302,7 +330,7 @@ const Entry = ({ outerWrapper }) => {
       >
         <FaIcon.FaTimesCircle
           className="text-4xl cursor-pointer absolute top-8 right-8"
-          onClick={() => setImgSel('')}
+          onClick={() => setImage('')}
         />
         {imgSel}
       </Mui.Backdrop>
@@ -319,14 +347,14 @@ const Entry = ({ outerWrapper }) => {
           </Mui.Button>
         </Mui.DialogActions>
       </Mui.Dialog>
-      <Mui.Backdrop open={loading} className="z-10 bg-transparent">
+      {/* <Mui.Backdrop open={loading} className="z-10 bg-transparent">
         <div className="animate-bounce">
           <Mui.CircularProgress
             color="inherit"
             className="text-rose-600 shadow-pop-rose rounded-full"
           />
         </div>
-      </Mui.Backdrop>
+      </Mui.Backdrop> */}
     </div>
   )
 }

@@ -55,4 +55,12 @@ select:-webkit-autofill:focus {
   outline: none !important;
 }
 
+ul.transition {
+  height: 100vh;
+}
+
+ul.transition li {
+  transform: scaleY(0);
+  width: 20%;
+}
 

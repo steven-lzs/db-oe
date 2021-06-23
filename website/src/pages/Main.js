@@ -11,6 +11,7 @@ import user from 'api/user'
 
 import { observer } from 'mobx-react'
 import store from '../store'
+import { enableBodyScroll } from 'body-scroll-lock'
 
 const directory = [
   { to: 'diary', icon: <Im.ImBook className="text-xl text-white m-auto" /> },
@@ -22,12 +23,13 @@ const directory = [
   },
 ]
 
-const Main = () => {
+const Main = ({ outerWrapper }) => {
   const history = useHistory()
   const tl = gsap.timeline()
 
   useEffect(() => {
     getMenu()
+    enableBodyScroll(outerWrapper.current)
     tl.to('.main-container', 0, {
       css: { visibility: 'visible' },
     }).from('.app-btn', 1, {
