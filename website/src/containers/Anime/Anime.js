@@ -7,7 +7,7 @@ import {
 } from 'react-router-dom'
 import gsap from 'gsap'
 
-import Login from '../../pages/Anime/Home'
+import Login from '../../pages/Anime/Konooto'
 
 const routes = [{ path: '/anime/login', name: 'Login', Component: Login }]
 

@@ -15,6 +15,8 @@ import Entry from 'pages/Diary/Entry'
 import View from 'pages/Diary/View'
 
 import Home from 'pages/Anime/Home'
+import Konooto from 'pages/Anime/Konooto'
+import YuruCamp from 'pages/Anime/YuruCamp'
 
 const routes = [
   { path: '/', name: 'Login', Component: Login },
@@ -24,6 +26,8 @@ const routes = [
   { path: '/diary/entry', name: 'Entry', Component: Entry },
   { path: '/diary/view', name: 'View', Component: View },
   { path: '/anime', name: 'Home', Component: Home },
+  { path: '/anime/konooto', name: 'Konooto', Component: Konooto },
+  { path: '/anime/yurucamp', name: 'Yuru Camp', Component: YuruCamp },
 ]
 
 const Wrapper = ({ outerWrapper }) => {
