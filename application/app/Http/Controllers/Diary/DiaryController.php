@@ -19,6 +19,7 @@ class DiaryController extends Controller
         
         $messages = [];
 
+        // verify param here
         $this->validate($request, $rules, $messages, $names);
 
         if($request->props){
