@@ -13,7 +13,7 @@ class MainController extends Controller
 
         return response()->json([
             'status' => 200,
-            'message' => 'Success',
+            'message' => 'Success!!',
             'data' => $result
         ]);
     }

@@ -24,7 +24,7 @@ class UserController extends Controller
         if (! $user || ! Hash::check($request->password, $user->password)) {
             return response()->json([
                 'status' => 500,
-                'message' => 'Password Incorrect.',
+                'message' => 'Password is Incorrect.',
                 'data' => []
             ]);
         }
